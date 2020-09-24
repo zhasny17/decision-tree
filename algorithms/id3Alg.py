@@ -107,5 +107,7 @@ def buildtree(data, entropy=entropy):
 def execute(dataset):
     tree = buildtree(dataset)
     json_dt = tree.exportToJson()
-    with open('decision_tree.json', 'w') as f:
-        f.write(json.dumps(json_dt))
+    # with open('decision_tree.json', 'w') as f:
+    #     f.write(json.dumps(json_dt))
+    # print(json_dt)
+    return json_dt

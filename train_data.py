@@ -6,6 +6,7 @@ from time import time
 import numpy
 import csv
 from datetime import datetime
+from read import validate_decision_tree
 
 
 def generate_dataset_from_csv():
@@ -39,9 +40,7 @@ def generate_dataset_from_csv():
                 year = 0
                 print('!!!!!!CONVERSION ERROR!!!!!! ', str(err))
         row[2] = year
-
     return dataset
-
 
 
 if __name__ == "__main__":
@@ -51,6 +50,20 @@ if __name__ == "__main__":
     print('execution time to generate dataset is: ', end_time-initial_time)
     print('dataset shape: ', len(dataset[0]), 'x', len(dataset))
     initial_time = time()
-    id3Alg.execute(dataset)
+    json_tree = id3Alg.execute(dataset)
     end_time = time()
     print('execution time to generate decision tree is: ', end_time-initial_time)
+    validate_data = [
+        [
+            'ISA',
+            'Imam Khomeini Spaceport, Semnan Space Center, Iran',
+            '2019',
+            'Safir-1B+ | Nahid-1',
+            'StatusActive',
+            ''
+        ]
+    ]
+    response = [
+        'Prelaunch Failure'
+    ]
+    validate_decision_tree(json_tree, validate_data, response)
