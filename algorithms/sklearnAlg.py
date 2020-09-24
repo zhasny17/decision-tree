@@ -1,8 +1,9 @@
 from sklearn import tree
 import numpy as np
 from sklearn.tree import _tree
+import json
 
-def export_to_json(decision_tree, out_file=None, feature_names=None, target_values=None):
+def export_to_json(decision_tree, out_data={}, feature_names=None, target_values=None):
     unique_target_values = list(set(target_values))
 
     def arr_to_py(arr):
@@ -12,20 +13,22 @@ def export_to_json(decision_tree, out_file=None, feature_names=None, target_valu
             wrapper = int
         return list(map(wrapper, arr.tolist()))
 
-    def node_to_str(tree, node_id, unique_target_values):
+    def node_to_dict(tree, node_id, unique_target_values):
         if tree.children_left[node_id] != _tree.TREE_LEAF:
             feature = tree.feature[node_id]
-            label = '"node": {}, "operation": "eolt", "value": {}'.format(feature, tree.threshold[node_id])
-            node_type = '"isLeaf": false'
-            node_repr = ", ".join((label, node_type))
+            node_repr =  {
+                "node": int(feature),
+                "operation": "eolt",
+                "value": (tree.threshold[node_id]),
+                "isLeaf": False
+            }
         else:
             values_x = arr_to_py(tree.value[node_id])
             target_index = values_x.index(max(list(values_x)))
-            node_repr = '"response": {}'.format(
-                unique_target_values[target_index]
-            )
-            node_type = '"isLeaf": true'
-            node_repr = ", ".join((node_repr, node_type))
+            node_repr = {
+                "response": unique_target_values[target_index],
+                "isLeaf": True
+            }
         return node_repr
 
     def recurse(tree, node_id, parent=None, unique_target_values=None):
@@ -35,23 +38,46 @@ def export_to_json(decision_tree, out_file=None, feature_names=None, target_valu
         left_child = tree.children_left[node_id]
         right_child = tree.children_right[node_id]
 
-        out_file.write('{' + '{}'.format(node_to_str(tree, node_id, unique_target_values=unique_target_values)))
+        out_data = node_to_dict(
+            tree=tree,
+            node_id=node_id,
+            unique_target_values=unique_target_values
+        )
 
         if left_child != _tree.TREE_LEAF:
-            out_file.write(', "children": [')
-            recurse(tree, right_child, node_id, unique_target_values=unique_target_values)
-            out_file.write(', ')
-            recurse(tree, left_child, node_id, unique_target_values=unique_target_values)
-            out_file.write(']')
-
-        out_file.write('}')
+            out_data["children"] = []
+            out_data["children"].append(
+                recurse(
+                    tree=tree,
+                    node_id=right_child,
+                    parent=node_id, 
+                    unique_target_values=unique_target_values
+                )
+            )
+            out_data["children"].append(
+                recurse(
+                    tree=tree,
+                    node_id=left_child,
+                    parent=node_id,
+                    unique_target_values=unique_target_values
+                )
+            )
+        return out_data
 
     if isinstance(decision_tree, _tree.Tree):
-        recurse(decision_tree, 0, unique_target_values=unique_target_values)
+        out_data = recurse(
+            tree=decision_tree,
+            node_id=0,
+            unique_target_values=unique_target_values
+        )
     else:
-        recurse(decision_tree.tree_, 0, unique_target_values=unique_target_values)
+        out_data = recurse(
+            tree=decision_tree.tree_,
+            node_id=0,
+            unique_target_values=unique_target_values
+        )
 
-    return out_file
+    return out_data
 
 
 def execute(dataset):
@@ -64,5 +90,6 @@ def execute(dataset):
     clf = tree.DecisionTreeClassifier()
     decision_tree = clf.fit(data, target)
 
-    with open('decision_tree.json', 'w') as f:
-        export_to_json(decision_tree, f, target_values=target)
+    with open("decision_tree.json", "w") as f:
+        data = export_to_json(decision_tree=decision_tree, target_values=target)
+        f.write(json.dumps(data))

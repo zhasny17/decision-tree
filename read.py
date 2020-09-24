@@ -1,5 +1,3 @@
-import pandas as pd
-import numpy as np
 import json
 from algorithms import sklearnAlg, id3Alg
 
@@ -61,12 +59,12 @@ if __name__ == "__main__":
 
     print('\n')
 
-    # Entropy algorithm
-    id3Alg.execute(data_set)
-    with open('decision_tree.json', 'r') as f:
-        decision_tree = json.load(f)
-    validade_decision_tree(
-        decision_tree,
-        truth_table,
-        responses
-    )
+    # # Entropy algorithm
+    # id3Alg.execute(data_set)
+    # with open('decision_tree.json', 'r') as f:
+    #     decision_tree = json.load(f)
+    # validade_decision_tree(
+    #     decision_tree,
+    #     truth_table,
+    #     responses
+    # )

@@ -2,11 +2,11 @@
 from pprint import pprint
 import json
 from operator import gt
+from math import log2
 
 
 def divideset(data, column, value):
     split_function = list(filter(lambda row: row[column] == value, data))
-
     set1 = [row for row in data if row in split_function]
     set2 = [row for row in data if row not in split_function]
     return (set1, set2)
@@ -23,7 +23,6 @@ def uniquecounts(data):
 
 
 def entropy(data):
-    from math import log2
     results = uniquecounts(data)
     ent = 0.0
     for r in results:
@@ -42,6 +41,7 @@ class Decisionnode:
         self.fb = fb
 
     def exportToJson(self):
+        print('building json tree!')
         response = {'isLeaf': self.isLeaf}
         if self.isLeaf:
             response['response'] = list(self.results.keys())[0]
@@ -57,6 +57,7 @@ class Decisionnode:
 
 
 def buildtree(data, entropy=entropy):
+    print('building tree!')
     if len(data) == 0:
         return decisionnode()
 
@@ -93,8 +94,12 @@ def buildtree(data, entropy=entropy):
     if best_gain > 0:
         trueBranch = buildtree(best_sets[0])
         falseBranch = buildtree(best_sets[1])
-        return Decisionnode(col=best_criteria[0], value=best_criteria[1],
-                            tb=trueBranch, fb=falseBranch)
+        return Decisionnode(
+            col=best_criteria[0],
+            value=best_criteria[1],
+            tb=trueBranch,
+            fb=falseBranch
+        )
     else:
         return Decisionnode(results=uniquecounts(data))
 
