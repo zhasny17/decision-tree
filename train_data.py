@@ -7,11 +7,13 @@ import numpy
 import csv
 from datetime import datetime
 from read import validate_decision_tree
+import sys
 
+sys.setrecursionlimit(10**6)
 
 def generate_dataset_from_csv():
     dataset = []
-    with open('Space_Corrected.csv', 'r') as f:
+    with open('data/Space_Corrected.csv', 'r') as f:
         data = csv.reader(f)
         for row in data:
             # removendo as duas primeiras colunas de dados desnecessarios

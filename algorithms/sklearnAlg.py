@@ -16,6 +16,7 @@ def export_to_json(decision_tree, out_data={}, feature_names=None, target_values
     def node_to_dict(tree, node_id, unique_target_values):
         if tree.children_left[node_id] != _tree.TREE_LEAF:
             feature = tree.feature[node_id]
+            print(tree)
             node_repr =  {
                 "node": int(feature),
                 "operation": "eolt",

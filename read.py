@@ -17,7 +17,7 @@ def validate_decision_tree(decision_tree, truth_table, truth_table_response):
                 dt = dt['children'][child_index]
             else:
                 print('invalid operator')
-                done = True
+                done = Truekf
             if dt['isLeaf']:
                 if dt['response'] == truth_table_response[index]:
                     success = True

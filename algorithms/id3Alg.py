@@ -3,6 +3,28 @@ from pprint import pprint
 import json
 from operator import gt
 from math import log2
+import sys
+from functools import wraps
+
+
+# class TailRecurseException(Exception):
+#     def __init__(self, args, kwargs):
+#         print('DONE@')
+#         super().__init__()
+#         self.args = args
+#         self.kwargs = kwargs
+
+
+# def tail_call_optimized(g):
+#     @wraps(g)
+#     def func(*args, **kwargs):
+#         while True:
+#             try:
+#                 return g(*args, **kwargs)
+#             except TailRecurseException as e:
+#                 args = e.args
+#                 kwargs = e.kwargs
+#     return func
 
 
 def divideset(data, column, value):
@@ -40,6 +62,7 @@ class Decisionnode:
         self.tb = tb
         self.fb = fb
 
+    # @tail_call_optimized
     def exportToJson(self):
         print('building json tree!')
         response = {'isLeaf': self.isLeaf}
@@ -55,7 +78,7 @@ class Decisionnode:
             ]
         return response
 
-
+# @tail_call_optimized
 def buildtree(data, entropy=entropy):
     print('building tree!')
     if len(data) == 0:
@@ -79,7 +102,7 @@ def buildtree(data, entropy=entropy):
             weight = float(len(set1))/len(data)
             gain -= weight*entropy(set1)
             column_info.append(
-                {   
+                {
                     'value': value,
                     'set1': set1,
                     'set2': set2
@@ -107,7 +130,4 @@ def buildtree(data, entropy=entropy):
 def execute(dataset):
     tree = buildtree(dataset)
     json_dt = tree.exportToJson()
-    # with open('decision_tree.json', 'w') as f:
-    #     f.write(json.dumps(json_dt))
-    # print(json_dt)
     return json_dt
